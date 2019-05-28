@@ -3,6 +3,9 @@
 #include "MessageHandler.hpp"
 #endif // !MESSAGEHANDLER_HPP
 
+KeyHandler* keyHandlerPtr = new KeyHandler();
+MouseHandler* mouseHandlerPtr = new MouseHandler();
+
 MessageHandler::MessageHandler()
 {
 }
@@ -22,6 +25,9 @@ LRESULT CALLBACK MessageHandler::handleMessage(HWND hWnd, UINT msg, WPARAM wPara
 		break;
 	case WM_LBUTTONDOWN:
 		mouseHandlerPtr->onLeftClickDown(hWnd);
+		break;
+	case WM_MOUSEMOVE:
+		mouseHandlerPtr->onMouseMove(hWnd, lParam);
 		break;
 	}
 

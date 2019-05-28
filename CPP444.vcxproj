@@ -133,6 +133,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="App.cpp" />
+    <ClCompile Include="Graphics.cpp" />
     <ClCompile Include="KeyHandler.cpp" />
     <ClCompile Include="MessageHandler.cpp" />
     <ClCompile Include="MouseHandler.cpp" />
@@ -140,6 +142,8 @@
     <ClCompile Include="WinMain.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="App.hpp" />
+    <ClInclude Include="Graphics.hpp" />
     <ClInclude Include="KeyHandler.hpp" />
     <ClInclude Include="Main.hpp" />
     <ClInclude Include="MessageHandler.hpp" />

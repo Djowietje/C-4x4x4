@@ -3,28 +3,31 @@
 #include <Windows.h>
 #endif
 
-#ifndef KEYHANDLER_HPP
-#define KEYHANDLER_HPP
-#include "KeyHandler.hpp"
-static KeyHandler* keyHandlerPtr = new KeyHandler();
-#endif
-
-#ifndef MOUSEHANDLER_HPP
-#define MOUSEHANDLER_HPP
-#include "MouseHandler.hpp"
-static MouseHandler* mouseHandlerPtr = new MouseHandler();
-#endif
-
 #ifndef MESSAGEHANDLER_HPP
 #define MESSAGEHANDLER_HPP
 #include "MessageHandler.hpp"
-static MessageHandler* messageHandlerPtr = new MessageHandler();
 #endif // !MESSAGEHANDLER_HPP
 
 #ifndef IOSTREAM
 #define IOSTREAM
 #include <iostream>
 #endif
+
+#ifndef SSTREAM
+#define SSTREAM
+#include <sstream>
+#endif
+
+#ifndef WINDOWSX_HPP
+#define WINDOWSX_HPP
+#include <windowsx.h>
+#endif // !WINDOWSX_HPP
+
+#ifndef OPTIONAL_HPP
+#define OPTIONAL_HPP
+#include <optional>
+#endif // !OPTIONAL_HPP
+
 
 #ifndef PROGRAM_NAME
 #define PROGRAM_NAME

@@ -3,13 +3,19 @@
 #include "Main.hpp"
 #endif
 
+#include "Graphics.hpp"
+#include <memory>
+
 class Window
 {
 public:
 	Window(int, int, const char* name);
 	~Window();
+	Window(const Window&) = delete;
+	Window& operator=(const Window&) = delete;
 	const char* name;
-
+	HWND getHandle();
+	Graphics& getGfxPtr();
 private:
 	class WindowClass
 	{
@@ -21,8 +27,6 @@ private:
 	private:
 		WindowClass(const WindowClass&) = delete;
 		WindowClass& operator=(const WindowClass&) = delete;
-		//static constexpr const char* wndClassName = "Main Window";
-		//static WindowClass wndClass;
 		HINSTANCE hInst;
 		const char* name;
 	};
@@ -30,4 +34,5 @@ private:
 	int width;
 	int height;
 	HWND hWnd;
+	std::unique_ptr<Graphics> pGfx;
 };

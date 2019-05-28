@@ -3,8 +3,6 @@
 #include "Window.hpp"
 #endif // !WINDOW_HPP
 
-//Window::WindowClass Window::WindowClass::wndClass;
-
 Window::WindowClass::WindowClass(const char* name) noexcept
 	:
 	hInst(GetModuleHandle(nullptr)),
@@ -13,7 +11,7 @@ Window::WindowClass::WindowClass(const char* name) noexcept
 	WNDCLASSEX wc = { 0 };
 	wc.cbSize = sizeof(wc);
 	wc.style = CS_OWNDC;
-	wc.lpfnWndProc = messageHandlerPtr->handleMessage;
+	wc.lpfnWndProc = MessageHandler::handleMessage;
 	wc.cbClsExtra = 0;
 	wc.cbWndExtra = 0;
 	wc.hInstance = GetInstance();
@@ -68,6 +66,17 @@ Window::Window(int width, int height, const char* name)
 
 	ShowWindow(hWnd, SW_SHOW);
 	
+	//Create a D3D11 Graphics object
+	pGfx = std::make_unique<Graphics>(hWnd);
+}
+
+HWND Window::getHandle() {
+	return hWnd;
+}
+
+Graphics& Window::getGfxPtr()
+{
+	return *pGfx;
 }
 
 Window::~Window()

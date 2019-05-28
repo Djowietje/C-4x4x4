@@ -9,4 +9,5 @@ public:
 	MouseHandler();
 	~MouseHandler();
 	void onLeftClickDown(HWND);
+	void onMouseMove(HWND, LPARAM);
 };
