@@ -39,3 +39,7 @@ static const char* pName = "CPP 4x4x4";
 #include "Window.hpp"
 #endif // !WINDOW_HPP
 
+#ifndef BOX_HPP
+#define BOX_HPP
+#include "Box.hpp"
+#endif // !BOX_HPP

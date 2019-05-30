@@ -50,24 +50,19 @@ Window::Window(int width, int height, const char* name)
 	WindowClass* wndClassPtr = new WindowClass(name);
 
 	// calculate window size based on desired client region size
-	RECT wr;
-	wr.left = 100;
-	wr.right = width + wr.left;
-	wr.top = 100;
-	wr.bottom = height + wr.top;
 	
 	hWnd = CreateWindowEx(
 		0, name,
 		name,
 		WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU,
-		200, 200, 800, 600,
+		200, 200, width, height,
 		nullptr, nullptr, wndClassPtr->GetInstance(), nullptr
 	);
 
 	ShowWindow(hWnd, SW_SHOW);
 	
 	//Create a D3D11 Graphics object
-	pGfx = std::make_unique<Graphics>(hWnd);
+	pGfx = std::make_unique<Graphics>(hWnd, width, height);
 }
 
 HWND Window::getHandle() {
