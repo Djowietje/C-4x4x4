@@ -2,6 +2,7 @@
 #include "Graphics.hpp"
 #include <wrl.h>
 #include "Drawable.hpp"
+#include <vector>
 
 class Box : public Drawable
 {
@@ -10,6 +11,7 @@ public:
 	Box() : Box(10, 10, 10) {}
 	~Box();
 	void update();
+
 private:
 	int length = 0;
 	int width = 0;

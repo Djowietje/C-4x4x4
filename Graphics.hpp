@@ -22,7 +22,7 @@ public:
 	ID3D11DeviceContext* getContextPointer();
 	ID3D11Device* getDevicePointer();
 	void clearBuffer(float red, float green, float blue) noexcept;
-	void drawObject(DrawableWithSize);
+	void drawObject(DrawableWithSize*);
 
 private:
 	ID3D11Device* pDevice = nullptr;

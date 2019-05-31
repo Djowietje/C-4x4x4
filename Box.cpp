@@ -1,22 +1,41 @@
 #include "Box.hpp"
 
-Vertex* vertices;
-int amountOfVertices;
-
 Box::Box(int length, int width, int height)
 	: 
 	length(length),
 	width(width),
 	height(height)
 {
-	Vertex vert[] = {
-		{ 0.0f,0.5f, 0.0f },
-		{ 0.5f,-0.5f, 0.0f },
-		{ -0.5f,-0.5f, 0.0f },
-	};
+	vertices = {
 
-	vertices = vert;
-	amountOfVertices = sizeof(vert) / sizeof(Vertex);
+		{0.05f,0.15f,0.1f}, //TOP LEFT BACK->
+		{0.15f,0.15f,0.1f}, //TOP RIGHT BACK ->
+		
+		{0.15f,0.15f,0.1f}, //TOP RIGHT BACK ->
+		{0.15f,0.05f,0.1f}, //BOTTOM RIGHT BACK ->
+
+		{0.15f,0.05f,0.1f}, //BOTTOM RIGHT BACK ->
+		{0.05f,0.05f,0.1f}, //BOTTOM LEFT BACK ->
+		
+		{0.05f,0.05f,0.1f}, //BOTTOM LEFT BACK ->
+		{0.05f,0.15f,0.1f}, //TOP LEFT BACK ->
+		
+		{0.05f,0.15f,0.1f}, //TOP LEFT BACK ->
+		{0.0f,0.1f,0.0f}, //TOP LEFT FRONT->
+
+		{0.0f,0.1f,0.0f}, //TOP LEFT FRONT->
+		{0.1f,0.1f,0.0f}, //TOP RIGHT FRONT ->
+
+		{0.1f,0.1f,0.0f}, //TOP RIGHT FRONT ->
+		{0.1f,0.0f,0.0f}, //BOTTOM RIGHT FRONT ->
+
+		{0.1f,0.0f,0.0f}, //BOTTOM RIGHT FRONT ->
+		{0.0f,0.0f,0.0f}, //BOTTOM LEFT FRONT ->
+
+		{0.0f,0.0f,0.0f}, //BOTTOM LEFT FRONT ->
+		{0.0f,0.1f,0.0f}, //TOP LEFT FRONT ->
+
+	};
 }
 
 Box::~Box()
@@ -25,18 +44,4 @@ Box::~Box()
 
 void Box::update()
 {
-}
-
-Vertex* Drawable::getVertices()
-{
-	return vertices;
-}
-
-int Drawable::getVertexCount() {
-	return amountOfVertices;
-}
-
-void Drawable::setVertices(const Vertex _vertices[])
-{
-	
 }

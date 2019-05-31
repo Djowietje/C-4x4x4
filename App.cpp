@@ -1,25 +1,21 @@
 #include "App.hpp"
-const int amountOfBoxes = 1;
-DrawableWithSize allObjects[amountOfBoxes];
+
+const int amountOfBoxes = 2;
 
 App::App() {
 	window = new Window(800, 600, "C++ 4x4x4");
 	pContext = window->getGfxPtr().getContextPointer();
 	pDevice = window->getGfxPtr().getDevicePointer();
+	objectsToDraw = {};
 }
 
 int App::setup() {
-	//Initialize all object we want to draw.
-	//DrawableWithSize* allObjects[amountOfBoxes];
 	
 	for (size_t i = 0; i < amountOfBoxes; i++)
 	{
-		DrawableWithSize obj = { new Box, sizeof(Box) };
-		allObjects[i] = obj;
-		amountOfObjects++;
+		DrawableWithSize obj = { new Box(20, 20, 20), sizeof(Box) };
+		objectsToDraw.push_back(obj);
 	}
-	//objectsToDraw = allObjects;
-	
 
 	while (true) {
 		if (const auto exitCode = processMessages()) return *exitCode;
@@ -33,16 +29,19 @@ void App::update() {
 	bool runOnce = true;
 
 	//Update all Drawables;
-	//for (size_t i = 0; i < amountOfObjects; i++) {
-	//	(*objectsToDraw[i]).obj->getVertices()[0].x += 0.001f;
-	//}
-	
+	for (size_t i = 0; i < objectsToDraw.size(); i++) {
+		DrawableWithSize d = objectsToDraw.data()[i];
+		Vertex* vertex = &d.obj->getVertices()->data()[8];
+		vertex->x = backGroundColor/10;
+	}
 	draw();
 }
 
 void App::draw() {
 	window->getGfxPtr().clearBuffer(backGroundColor, backGroundColor, 1.0f);
-	window->getGfxPtr().drawObject((allObjects[0]));
+	for (auto obj : objectsToDraw) {
+		window->getGfxPtr().drawObject(&obj);
+	}
 	pContext->Draw(1u, 0u);
 	window->getGfxPtr().swapBackToFrontBuffer();
 }

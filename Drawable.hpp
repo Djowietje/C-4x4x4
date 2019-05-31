@@ -1,4 +1,5 @@
 #pragma once
+#include <vector>
 
 #ifndef VERTEX_HPP
 #define VERTEX_HPP
@@ -8,8 +9,8 @@
 class Drawable
 {
 public:
-	virtual Vertex* getVertices();
-	virtual int getVertexCount();
+	std::vector<Vertex> vertices = {};
 
-	virtual void setVertices(const Vertex[]);
+	std::vector<Vertex>* getVertices() { return &vertices; };
+	void setVertices(std::vector<Vertex> _vertices) { vertices = _vertices; };
 };

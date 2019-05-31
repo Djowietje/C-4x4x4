@@ -6,10 +6,9 @@
 
 Graphics::Graphics(HWND hWnd, int width, int height)
 {
-
 	DXGI_SWAP_CHAIN_DESC sd = {};
-	sd.BufferDesc.Width = 0;
-	sd.BufferDesc.Height = 0;
+	sd.BufferDesc.Width = 800;
+	sd.BufferDesc.Height = 600;
 	sd.BufferDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
 	sd.BufferDesc.RefreshRate.Numerator = 0;
 	sd.BufferDesc.RefreshRate.Denominator = 0;
@@ -42,7 +41,8 @@ Graphics::Graphics(HWND hWnd, int width, int height)
 	//Create a Render Target View
 	ID3D11Resource* pBackBuffer = nullptr;
 	pSwap->GetBuffer(0, __uuidof(ID3D11Resource), reinterpret_cast<void**>(&pBackBuffer));
-	pDevice->CreateRenderTargetView(pBackBuffer, nullptr, &pTargetView);
+	if (pDevice && pBackBuffer) pDevice->CreateRenderTargetView(pBackBuffer, nullptr, &pTargetView);
+	else throw "Device and/or Backbuffer was not succesfully created!";
 	pBackBuffer->Release();
 
 	// create pixel shader
@@ -83,7 +83,7 @@ Graphics::Graphics(HWND hWnd, int width, int height)
 	pContext->OMSetRenderTargets(1u, pTargetView.GetAddressOf(), nullptr);
 
 	// Set Primitive Topology (how it will read the vertices)
-	pContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	pContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
 
 	// Create ViewPort Config
 	D3D11_VIEWPORT vp;
@@ -128,24 +128,21 @@ void Graphics::clearBuffer(float red, float green, float blue) noexcept
 	pContext->ClearRenderTargetView(pTargetView.Get(), color);
 }
 
-void Graphics::drawObject(DrawableWithSize struc)
+void Graphics::drawObject(DrawableWithSize* struc)
 {
-
 	wrl::ComPtr<ID3D11Buffer> pVertexBuffer;
-	size_t sizeOfVertices = sizeof(Vertex) * struc.obj->getVertexCount();
+
+
 	D3D11_BUFFER_DESC bd = {};
 	bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	bd.Usage = D3D11_USAGE_DEFAULT;
 	bd.CPUAccessFlags = 0u;
 	bd.MiscFlags = 0u;
-	bd.ByteWidth = (UINT)sizeOfVertices;
+	bd.ByteWidth = (UINT)sizeof(Vertex) * struc->obj->getVertices()->size();
 	bd.StructureByteStride = sizeof(Vertex);
-	
-	Vertex vertices[3];
-	memcpy(vertices, struc.obj->getVertices(), sizeOfVertices);
-	
+
 	D3D11_SUBRESOURCE_DATA sd = {};
-	sd.pSysMem = vertices;
+	sd.pSysMem = struc->obj->getVertices()->data();
 
 	pDevice->CreateBuffer(&bd, &sd, &pVertexBuffer);
 
@@ -154,6 +151,5 @@ void Graphics::drawObject(DrawableWithSize struc)
 	const UINT offset = 0u;
 	pContext->IASetVertexBuffers(0u, 1u, pVertexBuffer.GetAddressOf(), &stride, &offset);
 
-	
-	pContext->Draw(struc.obj->getVertexCount(), 0u);
+	pContext->Draw(struc->obj->getVertices()->size(), 0u);
 }
