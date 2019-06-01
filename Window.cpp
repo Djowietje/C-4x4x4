@@ -8,6 +8,7 @@ Window::WindowClass::WindowClass(const char* name) noexcept
 	hInst(GetModuleHandle(nullptr)),
 	name(name)
 {
+
 	WNDCLASSEX wc = { 0 };
 	wc.cbSize = sizeof(wc);
 	wc.style = CS_OWNDC;
@@ -49,16 +50,18 @@ Window::Window(int width, int height, const char* name)
 {
 	WindowClass* wndClassPtr = new WindowClass(name);
 
-	// calculate window size based on desired client region size
-	
+	pKeyHandler = new KeyHandler();
+	pMouseHandler = new MouseHandler();
+
 	hWnd = CreateWindowEx(
 		0, name,
 		name,
 		WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU,
 		200, 200, width, height,
-		nullptr, nullptr, wndClassPtr->GetInstance(), nullptr
+		nullptr, nullptr, wndClassPtr->GetInstance(), this
 	);
 
+	SetWindowLongPtr(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
 	ShowWindow(hWnd, SW_SHOW);
 	
 	//Create a D3D11 Graphics object
@@ -72,6 +75,16 @@ HWND Window::getHandle() {
 Graphics& Window::getGfxPtr()
 {
 	return *pGfx;
+}
+
+KeyHandler* Window::getKeyhandler()
+{
+	return pKeyHandler;
+}
+
+MouseHandler* Window::getMouseHandler()
+{
+	return pMouseHandler;
 }
 
 Window::~Window()

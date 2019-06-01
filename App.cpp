@@ -11,9 +11,11 @@ App::App() {
 
 int App::setup() {
 	
-	for (size_t i = 0; i < amountOfBoxes; i++)
-	{
-		DrawableWithSize obj = { new Box(20, 20, 20), sizeof(Box) };
+	for (size_t i = 0; i < amountOfBoxes; i++){
+		Box* b = new Box(0.1f, 0.1f, 0.1f);
+		b->getLocation()->x = 0.1f * i;
+		b->getLocation()->y = 0.1f * i;
+		DrawableWithSize obj = { b, sizeof(Box) };
 		objectsToDraw.push_back(obj);
 	}
 
@@ -31,8 +33,7 @@ void App::update() {
 	//Update all Drawables;
 	for (size_t i = 0; i < objectsToDraw.size(); i++) {
 		DrawableWithSize d = objectsToDraw.data()[i];
-		Vertex* vertex = &d.obj->getVertices()->data()[8];
-		vertex->x = backGroundColor/10;
+		d.obj->getLocation()->x += 0.01f;
 	}
 	draw();
 }

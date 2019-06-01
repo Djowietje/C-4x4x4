@@ -1,9 +1,16 @@
-#ifndef MAIN_HPP
-#define MAIN_HPP
-#include "Main.hpp"
-#endif
+#pragma once
+
+#include <Windows.h>
+#include <iostream>
+#include <sstream>
+#include <windowsx.h>
+#include <optional>
 
 #include "Graphics.hpp"
+#include "MessageHandler.hpp"
+#include "KeyHandler.hpp"
+#include "MouseHandler.hpp"
+
 #include <memory>
 
 class Window
@@ -16,6 +23,8 @@ public:
 	const char* name;
 	HWND getHandle();
 	Graphics& getGfxPtr();
+	KeyHandler* getKeyhandler();
+	MouseHandler* getMouseHandler();
 private:
 	class WindowClass
 	{
@@ -24,15 +33,19 @@ private:
 		HINSTANCE GetInstance() noexcept;
 		WindowClass(const char* name) noexcept;
 		~WindowClass();
+
 	private:
 		WindowClass(const WindowClass&) = delete;
 		WindowClass& operator=(const WindowClass&) = delete;
 		HINSTANCE hInst;
 		const char* name;
+
 	};
 
 	int width;
 	int height;
 	HWND hWnd;
 	std::unique_ptr<Graphics> pGfx;
+	MouseHandler* pMouseHandler;
+	KeyHandler* pKeyHandler;
 };

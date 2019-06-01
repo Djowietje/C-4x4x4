@@ -7,13 +7,13 @@
 class Box : public Drawable
 {
 public:
-	Box(int, int, int);
-	Box() : Box(10, 10, 10) {}
+	Box(float, float, float);
+	Box() : Box(0.1f, 0.1f, 0.1f) {}
 	~Box();
 	void update();
 
 private:
-	int length = 0;
-	int width = 0;
-	int height = 0;
+	float width = 0;
+	float height = 0;
+	float depth = 0;
 };

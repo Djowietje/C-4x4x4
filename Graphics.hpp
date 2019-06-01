@@ -1,13 +1,15 @@
 #pragma once
+
 #include <d3d11.h>
 #include <wrl.h>
 #include <iterator>
 #include <d3dcompiler.h>
+#include <stdio.h>
+#include <DirectXMath.h>
 
 #include "Box.hpp"
 #include "Drawable.hpp"
 #include "DrawableWithSize.hpp"
-
 
 namespace wrl = Microsoft::WRL;
 

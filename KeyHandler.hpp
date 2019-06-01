@@ -1,7 +1,8 @@
-#ifndef MAIN_HPP
-#define MAIN_HPP
-#include "Main.hpp"
-#endif
+#pragma once
+
+#include <Windows.h>
+#include <iostream>
+#include <sstream>
 
 class KeyHandler
 {

@@ -1,7 +1,8 @@
-#ifndef MAIN_HPP
-#define MAIN_HPP
-#include "Main.hpp"
-#endif
+#pragma once
+
+#include <Windows.h>
+#include <sstream>
+#include <windowsx.h>
 
 class MouseHandler
 {
@@ -10,4 +11,9 @@ public:
 	~MouseHandler();
 	void onLeftClickDown(HWND);
 	void onMouseMove(HWND, LPARAM);
+	int getMouseX() { return mouseX; }
+	int getMouseY() { return mouseY; }
+private:
+	int mouseX;
+	int mouseY;
 };

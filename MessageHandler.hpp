@@ -1,17 +1,10 @@
-#ifndef MAIN_HPP
-#define MAIN_HPP
-#include "Main.hpp"
-#endif
+#pragma once
 
-#ifndef KEYHANDLER_HPP
-#define KEYHANDLER_HPP
+#include <Windows.h>
+
+#include "Window.hpp"
 #include "KeyHandler.hpp"
-#endif
-
-#ifndef MOUSEHANDLER_HPP
-#define MOUSEHANDLER_HPP
 #include "MouseHandler.hpp"
-#endif
 
 class MessageHandler
 {
@@ -20,5 +13,5 @@ public:
 	~MessageHandler();
 	static LRESULT CALLBACK handleMessage(HWND, UINT, WPARAM, LPARAM);
 private:
-
+	static void setup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 };
