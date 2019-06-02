@@ -50,8 +50,7 @@ Window::Window(int width, int height, const char* name)
 {
 	WindowClass* wndClassPtr = new WindowClass(name);
 
-	pKeyHandler = new KeyHandler();
-	pMouseHandler = new MouseHandler();
+	
 
 	hWnd = CreateWindowEx(
 		0, name,
@@ -64,8 +63,10 @@ Window::Window(int width, int height, const char* name)
 	SetWindowLongPtr(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
 	ShowWindow(hWnd, SW_SHOW);
 	
-	//Create a D3D11 Graphics object
+	//Create a D3D11 Graphics object and pass it to handlers.
 	pGfx = new Graphics(hWnd, width, height);
+	pKeyHandler = new KeyHandler(pGfx);
+	pMouseHandler = new MouseHandler(pGfx);
 }
 
 HWND Window::getHandle() {

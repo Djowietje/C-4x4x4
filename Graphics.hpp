@@ -9,9 +9,11 @@
 
 #include "Descriptors.hpp"
 #include "ComPointers.hpp"
+#include "Camera.hpp"
 #include "Box.hpp"
 #include "Drawable.hpp"
 #include "DrawableWithSize.hpp"
+
 
 namespace wrl = Microsoft::WRL;
 
@@ -26,9 +28,11 @@ public:
 	void clearBuffer(float red, float green, float blue) noexcept;
 	void drawObject(DrawableWithSize*);
 	ComPointers* getComPointer();
+	Camera* getCamPointer();
 private:
 	Descriptors* desc;
 	ComPointers* cp;
+	Camera* cam;
 	D3D11_SUBRESOURCE_DATA vsd = {};
 	D3D11_SUBRESOURCE_DATA isd = {};
 	D3D11_SUBRESOURCE_DATA csd = {};

@@ -1,4 +1,5 @@
 #include "Graphics.hpp"
+#include <map>
 
 #pragma comment(lib, "d3d11.lib")
 #pragma comment(lib, "D3DCompiler.lib")
@@ -9,6 +10,7 @@ Graphics::Graphics(HWND hWnd, int width, int height)
 {
 	desc = new Descriptors(hWnd);
 	cp = new ComPointers();
+	cam = new Camera();
 
 	D3D11CreateDeviceAndSwapChain(
 		nullptr,
@@ -75,7 +77,12 @@ Graphics::Graphics(HWND hWnd, int width, int height)
 
 	//Create Depth Stencil Texture	
 	cp->pDevice->CreateTexture2D(desc->getDepthDesc(), nullptr, &cp->pDepthStencil);
-	cp->pDevice->CreateDepthStencilView(cp->pDepthStencil.Get(), desc->getDepthStencilViewDesc(), &cp->pDepthStencilView);
+	
+	auto a = cp->pDepthStencil.Get();
+	auto b = desc->getDepthStencilViewDesc();
+	auto c = cp->pDepthStencilView.GetAddressOf();
+
+	cp->pDevice->CreateDepthStencilView(a,b,c);
 
 	// Bind Render Target View
 	cp->pContext->OMSetRenderTargets(1u, cp->pTargetView.GetAddressOf(), cp->pDepthStencilView.Get());
@@ -97,6 +104,7 @@ void Graphics::clearBuffer(float red, float green, float blue) noexcept
 {
 	const float color[] = { red, green, blue, 1.0f };
 	cp->pContext->ClearRenderTargetView(cp->pTargetView.Get(), color);
+	cp->pContext->ClearDepthStencilView(cp->pDepthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0u);
 }
 
 void Graphics::drawObject(DrawableWithSize* struc)
@@ -110,10 +118,10 @@ void Graphics::drawObject(DrawableWithSize* struc)
 			dx::XMMatrixRotationZ(struc->obj->getRotation()->z) *
 			dx::XMMatrixScaling(struc->obj->getScale(), struc->obj->getScale(), struc->obj->getScale()) *
 			dx::XMMatrixTranslation(struc->obj->getLocation()->x, struc->obj->getLocation()->y, struc->obj->getLocation()->z + 1.0f) *
-			dx::XMMatrixPerspectiveLH(5.0f,5.0f, 0.1f, 100.0f)
+			cam->getViewMatrix()*
+			dx::XMMatrixPerspectiveLH(1.0f,1.0f, 0.1f, 5.0f)
 		)
 	};
-
 
 	vsd.pSysMem = struc->obj->getVertices()->data();
 	isd.pSysMem = struc->obj->getIndices()->data();
@@ -139,3 +147,9 @@ ComPointers* Graphics::getComPointer()
 {
 	return cp;
 }
+
+Camera* Graphics::getCamPointer()
+{
+	return cam;
+}
+

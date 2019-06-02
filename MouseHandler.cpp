@@ -1,10 +1,11 @@
-#ifndef MOUSEHANDLER_HPP
-#define MOUSEHANDLER_HPP
 #include "MouseHandler.hpp"
-#endif // !MOUSEHANDLER_HPP
 
-MouseHandler::MouseHandler() {
 
+MouseHandler::MouseHandler(Graphics* pGfx)
+	:
+	pGfx(pGfx)
+{
+	
 }
 
 MouseHandler::~MouseHandler() {
@@ -15,8 +16,20 @@ void MouseHandler::onLeftClickDown(HWND hWnd) {
 	SetWindowText(hWnd, "Clicked.");
 }
 
-void MouseHandler::onMouseMove(HWND hWnd, LPARAM lParam) {
+void MouseHandler::onMouseMove(HWND hWnd, LPARAM lParam, WPARAM wParam) {
+	auto newMouseX = GET_X_LPARAM(lParam);
+	auto newMouseY = GET_Y_LPARAM(lParam);
+
+	int directionX = mouseX - newMouseX;
+	int directionY = mouseY- newMouseY;
+
+	if (wParam == MK_LBUTTON) {
+		pGfx->getCamPointer()->mouseMoved(directionX, directionY);
+	}
+	mouseX = newMouseX;
+	mouseY = newMouseY;
+
 	std::stringstream ss;
-	ss << "Mouse Moved (X: " << GET_X_LPARAM(lParam) << ", Y: " << GET_Y_LPARAM(lParam) << ")";
+	ss << "Mouse Moved (X: " << newMouseX << ", Y: " << newMouseY << ")";
 	SetWindowText(hWnd, ss.str().c_str());
 }

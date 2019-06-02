@@ -1,11 +1,10 @@
-#ifndef KEYHANDLER_HPP
-#define KEYHANDLER_HPP
 #include "KeyHandler.hpp"
-#endif
 
-KeyHandler::KeyHandler()
+
+KeyHandler::KeyHandler(Graphics* pGfx)
+	:
+	pGfx(pGfx)
 {
-	std::cout << "INIT KeyHandler";
 }
 
 KeyHandler::~KeyHandler()

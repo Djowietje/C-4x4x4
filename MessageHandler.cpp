@@ -24,7 +24,7 @@ LRESULT CALLBACK MessageHandler::handleMessage(HWND hWnd, UINT msg, WPARAM wPara
 		window->getMouseHandler()->onLeftClickDown(hWnd);
 		break;
 	case WM_MOUSEMOVE:
-		window->getMouseHandler()->onMouseMove(hWnd, lParam);
+		window->getMouseHandler()->onMouseMove(hWnd, lParam, wParam);
 		break;
 	}
 	

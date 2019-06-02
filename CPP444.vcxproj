@@ -135,6 +135,7 @@
   <ItemGroup>
     <ClCompile Include="App.cpp" />
     <ClCompile Include="Box.cpp" />
+    <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Descriptors.cpp" />
     <ClCompile Include="Graphics.cpp" />
     <ClCompile Include="KeyHandler.cpp" />
@@ -146,6 +147,7 @@
   <ItemGroup>
     <ClInclude Include="App.hpp" />
     <ClInclude Include="Box.hpp" />
+    <ClInclude Include="Camera.hpp" />
     <ClInclude Include="ComPointers.hpp" />
     <ClInclude Include="Descriptors.hpp" />
     <ClInclude Include="Drawable.hpp" />

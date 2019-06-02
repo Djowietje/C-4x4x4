@@ -13,5 +13,4 @@ public:
 	~MessageHandler();
 	static LRESULT CALLBACK handleMessage(HWND, UINT, WPARAM, LPARAM);
 private:
-	static void setup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 };

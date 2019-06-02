@@ -3,17 +3,19 @@
 #include <Windows.h>
 #include <sstream>
 #include <windowsx.h>
+#include "Graphics.hpp"
 
 class MouseHandler
 {
 public:
-	MouseHandler();
+	MouseHandler(Graphics*);
 	~MouseHandler();
 	void onLeftClickDown(HWND);
-	void onMouseMove(HWND, LPARAM);
+	void onMouseMove(HWND, LPARAM, WPARAM);
 	int getMouseX() { return mouseX; }
 	int getMouseY() { return mouseY; }
 private:
-	int mouseX;
-	int mouseY;
+	Graphics* pGfx;
+	int mouseX = 0;
+	int mouseY = 0;
 };

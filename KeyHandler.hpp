@@ -3,11 +3,14 @@
 #include <Windows.h>
 #include <iostream>
 #include <sstream>
+#include "Graphics.hpp"
 
 class KeyHandler
 {
 public:
-	KeyHandler();
+	KeyHandler(Graphics*);
 	~KeyHandler();
 	void onKeyDown(WPARAM, HWND);
+private:
+	Graphics* pGfx;
 };
