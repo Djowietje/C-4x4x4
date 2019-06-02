@@ -65,16 +65,16 @@ Window::Window(int width, int height, const char* name)
 	ShowWindow(hWnd, SW_SHOW);
 	
 	//Create a D3D11 Graphics object
-	pGfx = std::make_unique<Graphics>(hWnd, width, height);
+	pGfx = new Graphics(hWnd, width, height);
 }
 
 HWND Window::getHandle() {
 	return hWnd;
 }
 
-Graphics& Window::getGfxPtr()
+Graphics* Window::getGfxPtr()
 {
-	return *pGfx;
+	return pGfx;
 }
 
 KeyHandler* Window::getKeyhandler()

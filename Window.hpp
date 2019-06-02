@@ -22,7 +22,7 @@ public:
 	Window& operator=(const Window&) = delete;
 	const char* name;
 	HWND getHandle();
-	Graphics& getGfxPtr();
+	Graphics* getGfxPtr();
 	KeyHandler* getKeyhandler();
 	MouseHandler* getMouseHandler();
 private:
@@ -45,7 +45,7 @@ private:
 	int width;
 	int height;
 	HWND hWnd;
-	std::unique_ptr<Graphics> pGfx;
+	Graphics* pGfx;
 	MouseHandler* pMouseHandler;
 	KeyHandler* pKeyHandler;
 };

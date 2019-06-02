@@ -1,20 +1,24 @@
 #include "App.hpp"
 
-const int amountOfBoxes = 2;
+const int amountOfBoxes = 8;
 
 App::App() {
 	window = new Window(800, 600, "C++ 4x4x4");
-	pContext = window->getGfxPtr().getContextPointer();
-	pDevice = window->getGfxPtr().getDevicePointer();
 	objectsToDraw = {};
+	gfx = window->getGfxPtr();
+
 }
 
 int App::setup() {
+	float width = 1.0f;
+	float height = 1.0f;
+	float depth = 1.0f;
 	
 	for (size_t i = 0; i < amountOfBoxes; i++){
-		Box* b = new Box(0.1f, 0.1f, 0.1f);
-		b->getLocation()->x = 0.1f * i;
-		b->getLocation()->y = 0.1f * i;
+		Box* b = new Box(width, height, depth);
+		b->getLocation()->x = width * (i%4);
+		b->getLocation()->y = height * (((i - i%4)/4)%4);
+		b->getLocation()->z = depth * ((i - i % 16) / 16);
 		DrawableWithSize obj = { b, sizeof(Box) };
 		objectsToDraw.push_back(obj);
 	}
@@ -26,25 +30,27 @@ int App::setup() {
 }
 
 void App::update() {
-	backGroundColor = sin(counter) /2.0f + 0.5f;
+	backGroundColor = sin(counter) /30.0f;
 	counter += 0.1f;
-	bool runOnce = true;
 
 	//Update all Drawables;
 	for (size_t i = 0; i < objectsToDraw.size(); i++) {
 		DrawableWithSize d = objectsToDraw.data()[i];
-		d.obj->getLocation()->x += 0.01f;
+		//d.obj->getLocation()->x += backGroundColor;
+		//d.obj->getRotation()->x += 0.01f;
+		d.obj->getRotation()->y -= 0.01f;
+
 	}
 	draw();
 }
 
 void App::draw() {
-	window->getGfxPtr().clearBuffer(backGroundColor, backGroundColor, 1.0f);
+	gfx->clearBuffer(backGroundColor, backGroundColor, 1.0f);
 	for (auto obj : objectsToDraw) {
-		window->getGfxPtr().drawObject(&obj);
+		gfx->drawObject(&obj);
 	}
-	pContext->Draw(1u, 0u);
-	window->getGfxPtr().swapBackToFrontBuffer();
+	gfx->getComPointer()->pContext->Draw(1u, 0u);
+	gfx->swapBackToFrontBuffer();
 }
 
 

@@ -16,10 +16,9 @@ private:
 	void draw();
 
 	Window* window;
+	Graphics* gfx;
 	std::vector<DrawableWithSize> objectsToDraw;
 
-	ID3D11DeviceContext* pContext;
-	ID3D11Device* pDevice;
 	float backGroundColor = 0.0f;
 	float counter = 0.0f;
 };

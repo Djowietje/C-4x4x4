@@ -7,6 +7,8 @@
 #include <stdio.h>
 #include <DirectXMath.h>
 
+#include "Descriptors.hpp"
+#include "ComPointers.hpp"
 #include "Box.hpp"
 #include "Drawable.hpp"
 #include "DrawableWithSize.hpp"
@@ -21,14 +23,17 @@ public:
 	Graphics& operator=(const Graphics&) = delete;
 	~Graphics();
 	void swapBackToFrontBuffer();
-	ID3D11DeviceContext* getContextPointer();
-	ID3D11Device* getDevicePointer();
 	void clearBuffer(float red, float green, float blue) noexcept;
 	void drawObject(DrawableWithSize*);
-
+	ComPointers* getComPointer();
 private:
-	ID3D11Device* pDevice = nullptr;
-	IDXGISwapChain* pSwap = nullptr;
-	ID3D11DeviceContext* pContext = nullptr;
-	wrl::ComPtr<ID3D11RenderTargetView> pTargetView;
+	Descriptors* desc;
+	ComPointers* cp;
+	D3D11_SUBRESOURCE_DATA vsd = {};
+	D3D11_SUBRESOURCE_DATA isd = {};
+	D3D11_SUBRESOURCE_DATA csd = {};
+	const UINT stride = sizeof(Vertex);
+	const UINT offset = 0u;
+
+
 };

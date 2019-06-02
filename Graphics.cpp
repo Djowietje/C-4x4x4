@@ -7,22 +7,8 @@ namespace dx = DirectX;
 
 Graphics::Graphics(HWND hWnd, int width, int height)
 {
-	DXGI_SWAP_CHAIN_DESC sd = {};
-	sd.BufferDesc.Width = 800;
-	sd.BufferDesc.Height = 600;
-	sd.BufferDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
-	sd.BufferDesc.RefreshRate.Numerator = 0;
-	sd.BufferDesc.RefreshRate.Denominator = 0;
-	sd.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
-	sd.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
-	sd.SampleDesc.Count = 1;
-	sd.SampleDesc.Quality = 0;
-	sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-	sd.BufferCount = 1;
-	sd.OutputWindow = hWnd;
-	sd.Windowed = TRUE;
-	sd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
-	sd.Flags = 0;
+	desc = new Descriptors(hWnd);
+	cp = new ComPointers();
 
 	D3D11CreateDeviceAndSwapChain(
 		nullptr,
@@ -32,167 +18,124 @@ Graphics::Graphics(HWND hWnd, int width, int height)
 		nullptr,
 		0,
 		D3D11_SDK_VERSION,
-		&sd,
-		&pSwap,
-		&pDevice,
+		desc->getSwapChainDesc(),
+		&cp->pSwap,
+		&cp->pDevice,
 		nullptr,
-		&pContext
+		&cp->pContext
 	);
 
 	//Create a Render Target View
 	ID3D11Resource* pBackBuffer = nullptr;
-	pSwap->GetBuffer(0, __uuidof(ID3D11Resource), reinterpret_cast<void**>(&pBackBuffer));
-	if (pDevice && pBackBuffer) pDevice->CreateRenderTargetView(pBackBuffer, nullptr, &pTargetView);
+	cp->pSwap->GetBuffer(0, __uuidof(ID3D11Resource), reinterpret_cast<void**>(&pBackBuffer));
+	if (cp->pDevice && pBackBuffer) cp->pDevice->CreateRenderTargetView(pBackBuffer, nullptr, &cp->pTargetView);
 	else throw "Device and/or Backbuffer was not succesfully created!";
 	pBackBuffer->Release();
 
-	// create pixel shader
-	wrl::ComPtr<ID3D11PixelShader> pPixelShader;
-	wrl::ComPtr<ID3DBlob> pBlob;
-	D3DReadFileToBlob(L"PixelShader.cso", &pBlob);
-	pDevice->CreatePixelShader(pBlob->GetBufferPointer(), pBlob->GetBufferSize(), nullptr, &pPixelShader);
+	//Create Shaders
+	D3DReadFileToBlob(L"PixelShader.cso", &cp->pBlob);
+	cp->pDevice->CreatePixelShader(cp->pBlob->GetBufferPointer(), cp->pBlob->GetBufferSize(), nullptr, &cp->pPixelShader);
 
-	// bind pixel shader
-	pContext->PSSetShader(pPixelShader.Get(), nullptr, 0u);
+	D3DReadFileToBlob(L"VertexShader.cso", &cp->pBlob);
+	cp->pDevice->CreateVertexShader(cp->pBlob->GetBufferPointer(), cp->pBlob->GetBufferSize(), nullptr, &cp->pVertexShader);
 
+	//Bind Shaders
+	cp->pContext->PSSetShader(cp->pPixelShader.Get(), nullptr, 0u);
+	cp->pContext->VSSetShader(cp->pVertexShader.Get(), nullptr, 0u);
 
-	// create vertex shader
-	wrl::ComPtr<ID3D11VertexShader> pVertexShader;
-	D3DReadFileToBlob(L"VertexShader.cso", &pBlob);
-	pDevice->CreateVertexShader(pBlob->GetBufferPointer(), pBlob->GetBufferSize(), nullptr, &pVertexShader);
-
-	// bind vertex shader
-	pContext->VSSetShader(pVertexShader.Get(), nullptr, 0u);
-
-	// input (vertex) layout (2d position only)
-	wrl::ComPtr<ID3D11InputLayout> pInputLayout;
+	//Input Descriptor of Vertex Data
 	const D3D11_INPUT_ELEMENT_DESC inputDesc[] =
 	{
 		{ "POSITION",0,DXGI_FORMAT_R32G32B32_FLOAT,0,0,D3D11_INPUT_PER_VERTEX_DATA,0 },
 		{ "COLOR",0,DXGI_FORMAT_R8G8B8A8_UNORM,0,12u,D3D11_INPUT_PER_VERTEX_DATA,0 },
 
 	};
-	pDevice->CreateInputLayout(
+
+	cp->pDevice->CreateInputLayout(
 		inputDesc, (UINT)std::size(inputDesc),
-		pBlob->GetBufferPointer(),
-		pBlob->GetBufferSize(),
-		&pInputLayout
+		cp->pBlob->GetBufferPointer(),
+		cp->pBlob->GetBufferSize(),
+		&cp->pInputLayout
 	);
 
 	// Bind Vertex Layout
-	pContext->IASetInputLayout(pInputLayout.Get());
-
-	// Bind Render Target View
-	pContext->OMSetRenderTargets(1u, pTargetView.GetAddressOf(), nullptr);
+	cp->pContext->IASetInputLayout(cp->pInputLayout.Get());
 
 	// Set Primitive Topology (how it will read the vertices)
-	pContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
-
-	// Create ViewPort Config
-	D3D11_VIEWPORT vp;
-	vp.Width = 800;
-	vp.Height = 600;
-	vp.MinDepth = 0;
-	vp.MaxDepth = 1;
-	vp.TopLeftX = 0;
-	vp.TopLeftY = 0;
+	cp->pContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
 
 	// Bind Viewport
-	pContext->RSSetViewports(1u, &vp);
+	cp->pContext->RSSetViewports(1u, desc->getViewPortDesc());
+
+	//Setup Depth Stencil State
+	cp->pDevice->CreateDepthStencilState(desc->getDepthStencilDesc(), &cp->pDSState);
+	
+	//Bind Depth Stencil State
+	cp->pContext->OMSetDepthStencilState(cp->pDSState.Get(), 1u);
+
+	//Create Depth Stencil Texture	
+	cp->pDevice->CreateTexture2D(desc->getDepthDesc(), nullptr, &cp->pDepthStencil);
+	cp->pDevice->CreateDepthStencilView(cp->pDepthStencil.Get(), desc->getDepthStencilViewDesc(), &cp->pDepthStencilView);
+
+	// Bind Render Target View
+	cp->pContext->OMSetRenderTargets(1u, cp->pTargetView.GetAddressOf(), cp->pDepthStencilView.Get());
 	
 }
 
 Graphics::~Graphics()
 {
-	if (pTargetView)  pTargetView->Release();
-	if (pContext) pContext->Release();
-	if (pSwap) pSwap->Release();
-	if (pDevice) pDevice->Release();
+	cp->~ComPointers();
 }
 
 void Graphics::swapBackToFrontBuffer()
 {
-	pSwap->Present(1u, 0u);
+	cp->pSwap->Present(1u, 0u);
 }
 
-ID3D11DeviceContext* Graphics::getContextPointer()
-{
-	return pContext;
-}
-
-ID3D11Device* Graphics::getDevicePointer()
-{
-	return pDevice;
-}
 
 void Graphics::clearBuffer(float red, float green, float blue) noexcept
 {
 	const float color[] = { red, green, blue, 1.0f };
-	pContext->ClearRenderTargetView(pTargetView.Get(), color);
+	cp->pContext->ClearRenderTargetView(cp->pTargetView.Get(), color);
 }
 
 void Graphics::drawObject(DrawableWithSize* struc)
 {
-	wrl::ComPtr<ID3D11Buffer> pVertexBuffer;
-	wrl::ComPtr<ID3D11Buffer> pIndexBuffer;
-	wrl::ComPtr<ID3D11Buffer> pConstantBuffer;
+	desc->updateBufferDescriptors(struc->obj->getVertices()->size(), struc->obj->getIndices()->size());
 
-	D3D11_BUFFER_DESC vbd = {};
-	vbd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-	vbd.Usage = D3D11_USAGE_DEFAULT;
-	vbd.CPUAccessFlags = 0u;
-	vbd.MiscFlags = 0u;
-	vbd.ByteWidth = (UINT) (sizeof(Vertex) * struc->obj->getVertices()->size());
-	vbd.StructureByteStride = sizeof(Vertex);
-
-	D3D11_BUFFER_DESC ibd = {};
-	ibd.BindFlags = D3D11_BIND_INDEX_BUFFER;
-	ibd.Usage = D3D11_USAGE_DEFAULT;
-	ibd.CPUAccessFlags = 0u;
-	ibd.MiscFlags = 0u;
-	ibd.ByteWidth = (UINT)(sizeof(Index) * struc->obj->getIndices()->size());
-	ibd.StructureByteStride = sizeof(Index);
-
-	D3D11_BUFFER_DESC cbd = {};
-	cbd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-	cbd.Usage = D3D11_USAGE_DYNAMIC;
-	cbd.CPUAccessFlags = D3D10_CPU_ACCESS_WRITE;
-	cbd.MiscFlags = 0u;
-	cbd.ByteWidth = (UINT) sizeof(dx::XMMATRIX);
-	cbd.StructureByteStride = 0u;
-
-	D3D11_SUBRESOURCE_DATA vsd = {};
-	vsd.pSysMem = struc->obj->getVertices()->data();
-	
-	D3D11_SUBRESOURCE_DATA isd = {};
-	isd.pSysMem = struc->obj->getIndices()->data();
-
-	auto location = struc->obj->getLocation();
 	dx::XMMATRIX transform = {
 		dx::XMMatrixTranspose(
-			//dx::XMMatrixRotationZ(struc->obj->getRotationZ()) * 
-			dx::XMMatrixScaling(3.0f/4.0f,1.0f,1.0f) *
-			dx::XMMatrixTranslation(location->x, location->y, location->z)
+			dx::XMMatrixRotationX(struc->obj->getRotation()->x) *
+			dx::XMMatrixRotationY(struc->obj->getRotation()->y) *
+			dx::XMMatrixRotationZ(struc->obj->getRotation()->z) *
+			dx::XMMatrixScaling(struc->obj->getScale(), struc->obj->getScale(), struc->obj->getScale()) *
+			dx::XMMatrixTranslation(struc->obj->getLocation()->x, struc->obj->getLocation()->y, struc->obj->getLocation()->z + 1.0f) *
+			dx::XMMatrixPerspectiveLH(5.0f,5.0f, 0.1f, 100.0f)
 		)
 	};
 
-	D3D11_SUBRESOURCE_DATA csd = {};
+
+	vsd.pSysMem = struc->obj->getVertices()->data();
+	isd.pSysMem = struc->obj->getIndices()->data();
 	csd.pSysMem = &transform;
 
-	pDevice->CreateBuffer(&vbd, &vsd, &pVertexBuffer);
-	pDevice->CreateBuffer(&ibd, &isd, &pIndexBuffer);
-	pDevice->CreateBuffer(&cbd, &csd, &pConstantBuffer);
+	cp->pDevice->CreateBuffer(desc->getVertexBufferDesc(), &vsd, &cp->pVertexBuffer);
+	cp->pDevice->CreateBuffer(desc->getIndicesBufferDesc(), &isd, &cp->pIndexBuffer);
+	cp->pDevice->CreateBuffer(desc->getConstantBufferDesc(), &csd, &cp->pConstantBuffer);
 
 	// Bind vertex buffer to pipeline
-	const UINT stride = sizeof(Vertex);
-	const UINT offset = 0u;
-	pContext->IASetVertexBuffers(0u, 1u, pVertexBuffer.GetAddressOf(), &stride, &offset);
+	cp->pContext->IASetVertexBuffers(0u, 1u, cp->pVertexBuffer.GetAddressOf(), &stride, &offset);
 
-	//Bind index buffer
-	pContext->IASetIndexBuffer(pIndexBuffer.Get(), DXGI_FORMAT_R16_UINT, 0u);
+	//Bind index buffer to pipeline
+	cp->pContext->IASetIndexBuffer(cp->pIndexBuffer.Get(), DXGI_FORMAT_R16_UINT, 0u);
 
 	//Bind Constant buffer to Vertex shader
-	pContext->VSSetConstantBuffers(0u, 1u, pConstantBuffer.GetAddressOf());
+	cp->pContext->VSSetConstantBuffers(0u, 1u, cp->pConstantBuffer.GetAddressOf());
 
 	//Size will be x 2 because we actually have 2 Index values in 1 Index -> From and To.
-	pContext->DrawIndexed((UINT)struc->obj->getIndices()->size()*2,0u, 0u);}
+	cp->pContext->DrawIndexed((UINT)struc->obj->getIndices()->size()*2,0u, 0u);}
+
+ComPointers* Graphics::getComPointer()
+{
+	return cp;
+}

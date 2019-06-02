@@ -10,15 +10,15 @@ Box::Box(float width, float height, float depth)
 	Color green = { 0, 255, 0, 255};
 
 	vertices = {
-		{0.0f,height,depth, red}, //TOP LEFT BACK->
-		{width,height,depth, red}, //TOP RIGHT BACK ->
-		{width,0.0f,depth, red}, //BOTTOM RIGHT BACK ->
-		{0.0f,0.0f,depth, red}, //BOTTOM LEFT BACK ->
+		{-width / 2,  height / 2, depth / 2, red}, //TOP LEFT BACK->
+		{ width / 2,  height / 2, depth / 2, red}, //TOP RIGHT BACK ->
+		{ width / 2, -height / 2, depth / 2, red}, //BOTTOM RIGHT BACK ->
+		{-width / 2, -height / 2, depth / 2, red}, //BOTTOM LEFT BACK ->
 		
-		{0.0f,height,0.0f, green}, //TOP LEFT FRONT->
-		{width,height,0.0f, green}, //TOP RIGHT FRONT ->
-		{width,0.0f,0.0f, green}, //BOTTOM RIGHT FRONT ->
-		{0.0f,0.0f,0.0f, green}, //BOTTOM LEFT FRONT ->
+		{-width / 2,  height / 2, -depth / 2, green}, //TOP LEFT FRONT->
+		{ width / 2,  height / 2, -depth / 2, green}, //TOP RIGHT FRONT ->
+		{ width / 2, -height / 2, -depth / 2, green}, //BOTTOM RIGHT FRONT ->
+		{-width / 2, -height / 2, -depth / 2, green}, //BOTTOM LEFT FRONT ->
 	};
 
 	indices = {
