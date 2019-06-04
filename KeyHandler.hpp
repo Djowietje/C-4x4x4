@@ -13,4 +13,5 @@ public:
 	void onKeyDown(WPARAM, HWND);
 private:
 	Graphics* pGfx;
+	std::stringstream getPositionString();
 };

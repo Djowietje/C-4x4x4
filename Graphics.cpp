@@ -118,8 +118,8 @@ void Graphics::drawObject(DrawableWithSize* struc)
 			dx::XMMatrixRotationZ(struc->obj->getRotation()->z) *
 			dx::XMMatrixScaling(struc->obj->getScale(), struc->obj->getScale(), struc->obj->getScale()) *
 			dx::XMMatrixTranslation(struc->obj->getLocation()->x, struc->obj->getLocation()->y, struc->obj->getLocation()->z + 1.0f) *
-			cam->getViewMatrix()*
-			dx::XMMatrixPerspectiveLH(1.0f,1.0f, 0.1f, 5.0f)
+			cam->getViewMatrix() *
+			dx::XMMatrixPerspectiveFovLH(70.0f, 800.0f/600.0f, 0.1f, 100.0f)
 		)
 	};
 

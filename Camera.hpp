@@ -11,16 +11,14 @@ public:
 	DirectX::XMVECTOR getLookAt();
 	DirectX::XMMATRIX getViewMatrix();
 
-	void setPosX(float x);
-	void setPosY(float y);
-	void setPosZ(float z);
-
+	void moveForward();
+	void moveBackward();
 	void mouseMoved(int x, int y);
-	void setLookAtX(float x);
-	void setLookAtY(float y);
-	void setLookAtZ(float z);
 
-	
+	float getPosX();
+	float getPosY();
+	float getPosZ();
+
 
 private:
 	float posX = 1.0f;
@@ -31,9 +29,21 @@ private:
 	float lookAtY = 0.0f;
 	float lookAtZ = 0.0f;
 
+	float movementSpeed = 0.1f;
+
 	float yaw = 0.0f;
 	float pitch = 0.0f;
 
-	DirectX::XMMATRIX viewMatrix;
+	float cosPitch = 0.0f;
+	float sinPitch = 0.0f;
+	float cosYaw = 0.0f;
+	float sinYaw = 0.0f;
+
+	DirectX::XMMATRIX viewMatrix = {};
+	DirectX::XMFLOAT3 xaxis = {};
+	DirectX::XMFLOAT3 yaxis = {};
+	DirectX::XMFLOAT3 zaxis = {};
+
+	void updateViewMatrix();
 
 };

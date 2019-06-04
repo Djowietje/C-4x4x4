@@ -1,6 +1,6 @@
 #include "App.hpp"
 
-const int amountOfBoxes = 8;
+const int amountOfBoxes = 64;
 
 App::App() {
 	window = new Window(800, 600, "C++ 4x4x4");
