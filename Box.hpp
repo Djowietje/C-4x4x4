@@ -11,9 +11,11 @@ public:
 	Box() : Box(1.0f, 1.0f, 1.0f) {}
 	~Box();
 	void update();
-
+	void setSelectedByPlayer(int);
 private:
 	float width = 1.0f;
 	float height = 1.0f;
 	float depth = 1.0f;
+	int selectedByPlayer = 0;
+	bool updated = false;
 };

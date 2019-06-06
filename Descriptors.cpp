@@ -32,6 +32,11 @@ D3D11_BUFFER_DESC* Descriptors::getConstantBufferDesc()
 	return &cbd;
 }
 
+D3D11_BUFFER_DESC* Descriptors::getColorBufferDesc()
+{
+	return &colorBufferDesc;
+}
+
 D3D11_DEPTH_STENCIL_DESC* Descriptors::getDepthStencilDesc()
 {
 	return &dsDesc;
@@ -82,14 +87,22 @@ void Descriptors::setupBufferDescriptors()
 	ibd.Usage = D3D11_USAGE_DEFAULT;
 	ibd.CPUAccessFlags = 0u;
 	ibd.MiscFlags = 0u;
-	ibd.StructureByteStride = sizeof(Index);
+	ibd.StructureByteStride = sizeof(unsigned short);
 
 	cbd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-	cbd.Usage = D3D11_USAGE_DYNAMIC;
-	cbd.CPUAccessFlags = D3D10_CPU_ACCESS_WRITE;
+	cbd.Usage = D3D11_USAGE_DEFAULT;
+	cbd.CPUAccessFlags = 0u;
 	cbd.MiscFlags = 0u;
 	cbd.ByteWidth = (UINT) sizeof(DirectX::XMMATRIX);
 	cbd.StructureByteStride = 0u;
+
+	colorBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	colorBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+	colorBufferDesc.CPUAccessFlags = 0u;
+	colorBufferDesc.MiscFlags = 0u;
+	colorBufferDesc.ByteWidth = (UINT) sizeof(Color);
+	colorBufferDesc.StructureByteStride = 0u;
+
 }
 
 void Descriptors::setupDepthStencilDescriptors()
@@ -123,8 +136,8 @@ void Descriptors::setupViewPort()
 	vp.TopLeftY = 0;
 }
 
-void Descriptors::updateBufferDescriptors(size_t vertexSize, size_t indicesSize)
+void Descriptors::updateBufferDescriptors(size_t vertexSize, size_t indicesSize, size_t amountOfColors)
 {
 	vbd.ByteWidth = (UINT)(sizeof(Vertex) * vertexSize);
-	ibd.ByteWidth = (UINT)(sizeof(Index) * indicesSize);
+	ibd.ByteWidth = (UINT)(sizeof(unsigned short) * indicesSize);
 }

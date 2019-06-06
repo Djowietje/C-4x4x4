@@ -1,4 +1,8 @@
-float4 main(float4 color: COLOR) : SV_TARGET
+cbuffer Colors {
+	float4 rgba;
+};
+
+float4 main(): SV_TARGET
 {
-	return color;
+	return rgba;
 }

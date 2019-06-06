@@ -1,8 +1,4 @@
-#ifndef MAIN_HPP
-#define MAIN_HPP
 #include "Main.hpp"
-#endif
-
 #include "App.hpp"
 
 int CALLBACK wWinMain(

@@ -1,7 +1,5 @@
-#ifndef WINDOW_HPP
-#define WINDOW_HPP
 #include "Window.hpp"
-#endif // !WINDOW_HPP
+#include "App.hpp"
 
 Window::WindowClass::WindowClass(const char* name) noexcept
 	:
@@ -42,11 +40,12 @@ HINSTANCE Window::WindowClass::GetInstance() noexcept
 
 
 // Window Stuff
-Window::Window(int width, int height, const char* name)
+Window::Window(int width, int height, const char* name, App* parent)
 	:
 	width(width),
 	height(height),
-	name(name)
+	name(name),
+	parent(parent)
 {
 	WindowClass* wndClassPtr = new WindowClass(name);
 
@@ -64,7 +63,7 @@ Window::Window(int width, int height, const char* name)
 	ShowWindow(hWnd, SW_SHOW);
 	
 	//Create a D3D11 Graphics object and pass it to handlers.
-	pGfx = new Graphics(hWnd, width, height);
+	pGfx = new Graphics(hWnd, width, height, this);
 	pKeyHandler = new KeyHandler(pGfx);
 	pMouseHandler = new MouseHandler(pGfx);
 }
@@ -86,6 +85,11 @@ KeyHandler* Window::getKeyhandler()
 MouseHandler* Window::getMouseHandler()
 {
 	return pMouseHandler;
+}
+
+App* Window::getParent()
+{
+	return parent;
 }
 
 Window::~Window()

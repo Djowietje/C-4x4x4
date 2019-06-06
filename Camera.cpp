@@ -28,6 +28,22 @@ void Camera::moveBackward()
 	updateViewMatrix();
 }
 
+void Camera::strafeLeft()
+{
+	posX -= movementSpeed * cosf(yaw) * cosf(pitch);
+	posZ += movementSpeed * sinf(yaw) * cosf(pitch);
+
+	updateViewMatrix();
+}
+
+void Camera::strafeRight()
+{
+	posX += movementSpeed * cosf(yaw) * cosf(pitch);
+	posZ -= movementSpeed * sinf(yaw) * cosf(pitch);
+
+	updateViewMatrix();
+}
+
 void Camera::mouseMoved(int x, int y)
 {
 	yaw -= (0.01f*x);// (x / 10);

@@ -13,10 +13,12 @@
 
 #include <memory>
 
+class App;
+
 class Window
 {
 public:
-	Window(int, int, const char* name);
+	Window(int, int, const char* name, App*);
 	~Window();
 	Window(const Window&) = delete;
 	Window& operator=(const Window&) = delete;
@@ -25,6 +27,7 @@ public:
 	Graphics* getGfxPtr();
 	KeyHandler* getKeyhandler();
 	MouseHandler* getMouseHandler();
+	App* getParent();
 private:
 	class WindowClass
 	{
@@ -48,4 +51,5 @@ private:
 	Graphics* pGfx;
 	MouseHandler* pMouseHandler;
 	KeyHandler* pKeyHandler;
+	App* parent;
 };

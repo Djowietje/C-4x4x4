@@ -1,4 +1,6 @@
 #include "Graphics.hpp"
+#include "Window.hpp"
+
 #include <map>
 
 #pragma comment(lib, "d3d11.lib")
@@ -6,8 +8,9 @@
 
 namespace dx = DirectX;
 
-Graphics::Graphics(HWND hWnd, int width, int height)
+Graphics::Graphics(HWND hWnd, int width, int height, Window* _parent)
 {
+	parent = _parent;
 	desc = new Descriptors(hWnd);
 	cp = new ComPointers();
 	cam = new Camera();
@@ -33,6 +36,10 @@ Graphics::Graphics(HWND hWnd, int width, int height)
 	if (cp->pDevice && pBackBuffer) cp->pDevice->CreateRenderTargetView(pBackBuffer, nullptr, &cp->pTargetView);
 	else throw "Device and/or Backbuffer was not succesfully created!";
 	pBackBuffer->Release();
+
+	//Create a Font ( for drawing text )
+	m_font = std::make_unique<DirectX::SpriteFont>(cp->pDevice.Get(), L"Courier.spritefont");
+	m_spriteBatch = std::make_unique<DirectX::SpriteBatch>(cp->pContext.Get());
 
 	//Create Shaders
 	D3DReadFileToBlob(L"PixelShader.cso", &cp->pBlob);
@@ -109,7 +116,7 @@ void Graphics::clearBuffer(float red, float green, float blue) noexcept
 
 void Graphics::drawObject(DrawableWithSize* struc)
 {
-	desc->updateBufferDescriptors(struc->obj->getVertices()->size(), struc->obj->getIndices()->size());
+	D3D11_SUBRESOURCE_DATA colorData;
 
 	dx::XMMATRIX transform = {
 		dx::XMMatrixTranspose(
@@ -123,13 +130,27 @@ void Graphics::drawObject(DrawableWithSize* struc)
 		)
 	};
 
+	std::vector<unsigned short>* indices;
+	if (struc->obj->getDrawMode() == 0) {
+		indices = struc->obj->getIndices();
+	}
+	else {
+		cp->pContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		indices = struc->obj->getIndicesTriangles();
+	}
+
+	desc->updateBufferDescriptors(struc->obj->getVertices()->size(), indices->size(), 1);
+
+
 	vsd.pSysMem = struc->obj->getVertices()->data();
-	isd.pSysMem = struc->obj->getIndices()->data();
+	isd.pSysMem = indices->data();
 	csd.pSysMem = &transform;
+	colorData.pSysMem = struc->obj->getColor();
 
 	cp->pDevice->CreateBuffer(desc->getVertexBufferDesc(), &vsd, &cp->pVertexBuffer);
 	cp->pDevice->CreateBuffer(desc->getIndicesBufferDesc(), &isd, &cp->pIndexBuffer);
 	cp->pDevice->CreateBuffer(desc->getConstantBufferDesc(), &csd, &cp->pConstantBuffer);
+	cp->pDevice->CreateBuffer(desc->getColorBufferDesc(), &colorData, &cp->pColorBuffer);
 
 	// Bind vertex buffer to pipeline
 	cp->pContext->IASetVertexBuffers(0u, 1u, cp->pVertexBuffer.GetAddressOf(), &stride, &offset);
@@ -140,8 +161,18 @@ void Graphics::drawObject(DrawableWithSize* struc)
 	//Bind Constant buffer to Vertex shader
 	cp->pContext->VSSetConstantBuffers(0u, 1u, cp->pConstantBuffer.GetAddressOf());
 
-	//Size will be x 2 because we actually have 2 Index values in 1 Index -> From and To.
-	cp->pContext->DrawIndexed((UINT)struc->obj->getIndices()->size()*2,0u, 0u);}
+	//Bind Color buffer to Pixel shader
+	cp->pContext->PSSetConstantBuffers(0u, 1u, cp->pColorBuffer.GetAddressOf());
+
+	//Draw the object
+	cp->pContext->DrawIndexed((UINT)indices->size(),0u, 0u);
+
+	//Set drawmode back to default:
+	cp->pContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+
+}
+
+
 
 ComPointers* Graphics::getComPointer()
 {
@@ -151,5 +182,10 @@ ComPointers* Graphics::getComPointer()
 Camera* Graphics::getCamPointer()
 {
 	return cam;
+}
+
+Window* Graphics::getParent()
+{
+	return parent;
 }
 

@@ -13,6 +13,8 @@ public:
 
 	void moveForward();
 	void moveBackward();
+	void strafeLeft();
+	void strafeRight();
 	void mouseMoved(int x, int y);
 
 	float getPosX();
