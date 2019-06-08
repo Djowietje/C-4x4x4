@@ -12,6 +12,7 @@ public:
 	~Box();
 	void update();
 	void setSelectedByPlayer(int);
+	int getSelectedByPlayer();
 private:
 	float width = 1.0f;
 	float height = 1.0f;

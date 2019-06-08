@@ -28,8 +28,4 @@ void MouseHandler::onMouseMove(HWND hWnd, LPARAM lParam, WPARAM wParam) {
 	}
 	mouseX = newMouseX;
 	mouseY = newMouseY;
-
-	std::stringstream ss;
-	ss << "Mouse Moved (X: " << newMouseX << ", Y: " << newMouseY << ")";
-	SetWindowText(hWnd, ss.str().c_str());
 }

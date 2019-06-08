@@ -10,6 +10,20 @@ class ComPointers
 public:
 	ComPointers(){};
 	~ComPointers(){
+
+		if(pVertexBuffer) pVertexBuffer->Release();
+		if(pIndexBuffer) pIndexBuffer->Release();
+		if(pConstantBuffer) pConstantBuffer->Release();
+		if(pColorBuffer) pColorBuffer->Release();
+
+		if(pPixelShader) pPixelShader->Release();
+		if(pVertexShader) pVertexShader->Release();
+		if(pBlob) pBlob->Release();
+		if(pInputLayout) pInputLayout->Release();
+		if(pDSState) pDSState->Release();
+		if(pDepthStencil) pDepthStencil->Release();
+		if(pDepthStencilView) pDepthStencilView->Release();
+
 		if (pTargetView) pTargetView->Release();
 		if (pContext) pContext->Release();
 		if (pSwap) pSwap->Release();

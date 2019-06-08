@@ -14,4 +14,6 @@ public:
 private:
 	Graphics* pGfx;
 	std::stringstream getPositionString();
+	WPARAM prevInput;
+
 };

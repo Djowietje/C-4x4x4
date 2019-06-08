@@ -4,7 +4,7 @@
 class Camera
 {
 public:
-	Camera() {};
+	Camera();
 	~Camera() {};
 
 	DirectX::XMVECTOR getPosition();

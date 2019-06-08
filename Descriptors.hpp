@@ -28,15 +28,15 @@ private:
 	void setupDepthStencilDescriptors();
 	void setupViewPort();
 
-	DXGI_SWAP_CHAIN_DESC sd = {};
-	D3D11_BUFFER_DESC vbd = {};
-	D3D11_BUFFER_DESC ibd = {};
-	D3D11_BUFFER_DESC cbd = {};
-	D3D11_BUFFER_DESC colorBufferDesc = {};
-	D3D11_DEPTH_STENCIL_DESC dsDesc = {};
-	D3D11_DEPTH_STENCIL_VIEW_DESC descDepthView;
-	D3D11_TEXTURE2D_DESC descDepth = {};
-	D3D11_VIEWPORT vp = {};
+	DXGI_SWAP_CHAIN_DESC sd = { 0 };
+	D3D11_BUFFER_DESC vbd = { 0 };
+	D3D11_BUFFER_DESC ibd = { 0 };
+	D3D11_BUFFER_DESC cbd = { 0 };
+	D3D11_BUFFER_DESC colorBufferDesc = { 0 };
+	D3D11_DEPTH_STENCIL_DESC dsDesc = { 0 };
+	D3D11_DEPTH_STENCIL_VIEW_DESC descDepthView = { };
+	D3D11_TEXTURE2D_DESC descDepth = { 0 };
+	D3D11_VIEWPORT vp = { 0 };
 
 
 };

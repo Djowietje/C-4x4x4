@@ -107,9 +107,24 @@ void Descriptors::setupBufferDescriptors()
 
 void Descriptors::setupDepthStencilDescriptors()
 {
-	dsDesc.DepthEnable = TRUE;
+	dsDesc.DepthEnable = true;
 	dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
 	dsDesc.DepthFunc = D3D11_COMPARISON_LESS; // Only show closer z values.
+	dsDesc.StencilEnable = true;
+	dsDesc.StencilReadMask = 0xFF;
+	dsDesc.StencilWriteMask = 0xFF;
+
+	// Stencil operations if pixel is front-facing
+	dsDesc.FrontFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+	dsDesc.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_INCR;
+	dsDesc.FrontFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
+	dsDesc.FrontFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+
+	// Stencil operations if pixel is back-facing
+	dsDesc.BackFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+	dsDesc.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP_DECR;
+	dsDesc.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
+	dsDesc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
 
 	descDepth.Width = 800;
 	descDepth.Height = 600;
@@ -120,6 +135,8 @@ void Descriptors::setupDepthStencilDescriptors()
 	descDepth.SampleDesc.Quality = 0u;
 	descDepth.Usage = D3D11_USAGE_DEFAULT;
 	descDepth.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+	descDepth.CPUAccessFlags = 0;
+	descDepth.MiscFlags = 0;
 
 	descDepthView.Format = DXGI_FORMAT_D32_FLOAT;
 	descDepthView.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;

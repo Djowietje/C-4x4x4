@@ -74,3 +74,8 @@ void Box::setSelectedByPlayer(int _selectedByPlayer)
 {
 	selectedByPlayer = _selectedByPlayer;
 }
+
+int Box::getSelectedByPlayer()
+{
+	return selectedByPlayer;
+}

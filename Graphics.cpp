@@ -37,9 +37,9 @@ Graphics::Graphics(HWND hWnd, int width, int height, Window* _parent)
 	else throw "Device and/or Backbuffer was not succesfully created!";
 	pBackBuffer->Release();
 
-	//Create a Font ( for drawing text )
-	m_font = std::make_unique<DirectX::SpriteFont>(cp->pDevice.Get(), L"Courier.spritefont");
-	m_spriteBatch = std::make_unique<DirectX::SpriteBatch>(cp->pContext.Get());
+	//Load Text Drawing stuff
+	FW1CreateFactory(FW1_VERSION, &pFW1Factory);
+	pFW1Factory->CreateFontWrapper(cp->pDevice.Get(), L"Arial", &pFontWrapper);
 
 	//Create Shaders
 	D3DReadFileToBlob(L"PixelShader.cso", &cp->pBlob);
@@ -98,6 +98,8 @@ Graphics::Graphics(HWND hWnd, int width, int height, Window* _parent)
 
 Graphics::~Graphics()
 {
+	pFontWrapper->Release();
+	pFW1Factory->Release();
 	cp->~ComPointers();
 }
 
@@ -172,7 +174,57 @@ void Graphics::drawObject(DrawableWithSize* struc)
 
 }
 
+void Graphics::drawTextOnScreen(const char* text, int x, int y)
+{
+	pFontWrapper->DrawString(
+		cp->pContext.Get(),
+		convertCharToWchar(text),// String
+		32.0f,// Font size
+		(float) x,// X position
+		(float) y,// Y position
+		0xffffffff,// Text color, 0xAaBbGgRr
+		FW1_RESTORESTATE// Flags (for example FW1_RESTORESTATE to keep context states unchanged)
+	);
 
+}
+
+
+
+void Graphics::drawTextIn3DSpace(const char* text, float x, float y, float z)
+{
+	////Convert x,y,z to screen x,y positions.
+	//dx::XMMATRIX transform = {
+	//	dx::XMMatrixTranslation(x,y,z) *
+	//	cam->getViewMatrix() *
+	//	dx::XMMatrixPerspectiveFovLH(70.0f, 800.0f / 600.0f, 0.1f, 100.0f)		
+	//};
+	//
+	//auto transformedCoords = dx::XMVector3Transform(dx::XMVECTOR{ 0.1f, 0.1f, 0.1f}, transform);
+	//
+	//auto newX = dx::XMVectorGetX(transformedCoords);
+	//auto newY = dx::XMVectorGetY(transformedCoords);
+	//auto newZ = dx::XMVectorGetZ(transformedCoords);
+	//
+	//float u = (newX / newZ +1);
+	//float v = (newY / newZ +1);
+	//
+	//std::stringstream ss;
+	//ss << "Text Coords (X: " << newX << ", Y: " << newY << ", Z: " << newZ << ") Box1, U: " << u << ", V: " << v << ")";
+	//SetWindowText(parent->getHandle(), ss.str().c_str());
+	//
+	////Then call drawTextOnScreen
+	//drawTextOnScreen(text, u, v);
+
+}
+
+const wchar_t* Graphics::convertCharToWchar(const char* text)
+{
+	size_t origsizes = strlen(text) + 1;
+	size_t convertedCharP = 0;
+	wchar_t constTowchar[500];
+	mbstowcs_s(&convertedCharP, constTowchar, origsizes, text, _TRUNCATE);
+	return constTowchar;
+}
 
 ComPointers* Graphics::getComPointer()
 {

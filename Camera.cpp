@@ -1,5 +1,10 @@
 #include "Camera.hpp"
 
+Camera::Camera()
+{
+	updateViewMatrix();
+}
+
 DirectX::XMVECTOR Camera::getPosition() { return DirectX::XMVECTOR{ posX, posY, posZ }; }
 
 DirectX::XMVECTOR Camera::getLookAt() { return DirectX::XMVECTOR{ lookAtX, lookAtY, lookAtZ }; }

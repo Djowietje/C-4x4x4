@@ -1,7 +1,6 @@
 #include "App.hpp"
 
 const int amountOfBoxes = 64;
-int playerTurn = 1;
 
 App::App() {
 	window = new Window(800, 600, "C++ 4x4x4", this);
@@ -19,6 +18,7 @@ int App::setup() {
 	float y = 0.0f;
 	float z = 0.0f;
 
+	   
 	for (auto& layer : playingField) // Iterating over layers (Z)
 	{
 		for (auto& row : layer) // Iterating over rows
@@ -36,9 +36,9 @@ int App::setup() {
 					y = 0.0f;
 				}
 
-				box->getLocation()->x = x;
-				box->getLocation()->y = y;
-				box->getLocation()->z = z;
+				box->getLocation()->x = z;
+				box->getLocation()->y = x;
+				box->getLocation()->z = y;
 
 				DrawableWithSize obj = { box, sizeof(Box) };
 				objectsToDraw.push_back(obj);
@@ -66,34 +66,47 @@ void App::update() {
 			}
 		}
 	}
-	
 
+	gfx->clearBuffer(backGroundColor, backGroundColor, 1.0f);
+	
 	draw();
+
+	if (winner != 0) {
+		std::stringstream ss;
+		ss << "Winner Player #" << winner << " !";
+		gfx->drawTextOnScreen(ss.str().c_str(), 0, 0);
+	}
+	
+	gfx->swapBackToFrontBuffer();
+
 }
 
 void App::draw() {
-	gfx->clearBuffer(backGroundColor, backGroundColor, 1.0f);
-
-	//Draw some text
-	//https://github.com/Microsoft/DirectXTK/wiki/Drawing-text
-	//gfx->m_spriteBatch->Begin();
-	//const wchar_t* text = L"Hello World";
-
-	//DirectX::XMVECTOR pos = { 0.0f,0.0f };
-	//DirectX::XMVECTOR col = { 0.0f,0.0f,0.0f,0.0f };
-
-	//gfx->m_font->DrawString(gfx->m_spriteBatch.get(), text, pos, col, 0.f, pos);
-	//gfx->m_spriteBatch->End();
 
 	for (auto obj : objectsToDraw) {
 		gfx->drawObject(&obj);
 	}
 	gfx->getComPointer()->pContext->Draw(1u, 0u);
-
-	gfx->swapBackToFrontBuffer();
-
 }
 
+bool App::selectColumn(int x, int z)
+{
+	auto yColumn = playingField[x][z];
+	bool succes = false;
+
+	for (size_t i = 0; i < 4; i++)
+	{
+		if (yColumn[i]->getSelectedByPlayer() == 0 ) {
+			yColumn[i]->setSelectedByPlayer(playerTurn);
+			changePlayer();
+			succes = true;
+			break;
+		}
+	}
+
+	if (succes) checkForWinner();
+	return succes;
+}
 
 std::optional<int> App::processMessages() {
 	MSG msg;
@@ -106,4 +119,101 @@ std::optional<int> App::processMessages() {
 	}
 	return {};
 
+}
+
+int App::getPlayerTurn()
+{
+	return playerTurn;
+}
+
+void App::changePlayer() 
+{
+	playerTurn = playerTurn %2 +1;
+}
+
+void App::checkForWinner() {
+	
+	auto winner = checkVertically();
+	if (!winner) winner = checkHorizontallyZ();
+	if (!winner) winner = checkHorizontallyX();
+	
+
+}
+
+bool App::checkVertically() {
+	int firstSelection;
+	bool solidRow = true;
+	bool winnerFound = false;
+
+	for (size_t k = 0; k < 4; k++)
+	{
+		for (size_t j = 0; j < 4; j++)
+		{
+			if (!winnerFound) {
+				for (size_t i = 0; i < 4; i++)
+				{
+					if (i == 0) firstSelection = playingField[k][j][0]->getSelectedByPlayer();
+					else solidRow = solidRow && (playingField[k][j][i]->getSelectedByPlayer() == firstSelection);
+				}
+
+				if (solidRow) {
+					winner = firstSelection;
+					winnerFound = true;
+				}
+			}
+		}
+	}
+	return winnerFound;
+}
+
+bool App::checkHorizontallyZ() {
+	int firstSelection;
+	bool solidRow = true;
+	bool winnerFound = false;
+
+	for (size_t k = 0; k < 4; k++)
+	{
+		for (size_t j = 0; j < 4; j++)
+		{
+			if (!winnerFound) {
+				for (size_t i = 0; i < 4; i++)
+				{
+					if (i == 0) firstSelection = playingField[j][0][k]->getSelectedByPlayer();
+					else solidRow = solidRow && (playingField[j][i][k]->getSelectedByPlayer() == firstSelection);
+				}
+
+				if (solidRow) {
+					winner = firstSelection;
+					winnerFound = true;
+				}
+			}
+		}
+	}
+	return winnerFound;
+}
+
+bool App::checkHorizontallyX() {
+	int firstSelection;
+	bool solidRow = true;
+	bool winnerFound = false;
+
+	for (size_t k = 0; k < 4; k++)
+	{
+		for (size_t j = 0; j < 4; j++)
+		{
+			if (!winnerFound) {
+				for (size_t i = 0; i < 4; i++)
+				{
+					if (i == 0) firstSelection = playingField[0][j][k]->getSelectedByPlayer();
+					else solidRow = solidRow && (playingField[i][j][k]->getSelectedByPlayer() == firstSelection);
+				}
+
+				if (solidRow) {
+					winner = firstSelection;
+					winnerFound = true;
+				}
+			}
+		}
+	}
+	return winnerFound;
 }

@@ -16,6 +16,7 @@
 #include "Box.hpp"
 #include "Drawable.hpp"
 #include "DrawableWithSize.hpp"
+#include "FW1FontWrapper.h"
 
 namespace wrl = Microsoft::WRL;
 
@@ -31,12 +32,17 @@ public:
 	void swapBackToFrontBuffer();
 	void clearBuffer(float red, float green, float blue) noexcept;
 	void drawObject(DrawableWithSize*);
+	void drawTextOnScreen(const char*, int x, int y);
+	void drawTextIn3DSpace(const char*, float x, float y, float z);
+	const wchar_t* convertCharToWchar(const char*);
 	ComPointers* getComPointer();
 	Camera* getCamPointer();
 	Window* getParent();
 	std::unique_ptr<DirectX::SpriteFont> m_font;
 	std::unique_ptr<DirectX::SpriteBatch> m_spriteBatch;
 private:
+	IFW1Factory* pFW1Factory;
+	IFW1FontWrapper* pFontWrapper;
 	Descriptors* desc;
 	ComPointers* cp;
 	Camera* cam;
