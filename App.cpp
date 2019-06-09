@@ -19,9 +19,9 @@ int App::setup() {
 	float z = 0.0f;
 
 	   
-	for (auto& layer : playingField) // Iterating over layers (Z)
+	for (auto& layer : playingField) // Iterating over slice [Y,Z]
 	{
-		for (auto& row : layer) // Iterating over rows
+		for (auto& row : layer) // Iterating over rows [Z]
 		{
 			for (auto& box : row) {
 				box = new Box(width, height, depth);
@@ -36,6 +36,7 @@ int App::setup() {
 					y = 0.0f;
 				}
 
+				//Reverse the location order because we want [X][Y][Z] coordinates instead of [Z][Y][X]
 				box->getLocation()->x = z;
 				box->getLocation()->y = y;
 				box->getLocation()->z = x;
@@ -57,9 +58,9 @@ void App::update() {
 	counter += 0.1f;
 
 	//Update all boxes (checking state)
-	for (auto& layer : playingField) // Iterating over layers (Z)
+	for (auto& layer : playingField) // Iterating over slice [Y,Z]
 	{
-		for (auto& row : layer) // Iterating over rows
+		for (auto& row : layer) // Iterating over rows [Z]
 		{
 			for (auto& box : row) { 
 				box->update();
