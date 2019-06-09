@@ -37,8 +37,8 @@ int App::setup() {
 				}
 
 				box->getLocation()->x = z;
-				box->getLocation()->y = x;
-				box->getLocation()->z = y;
+				box->getLocation()->y = y;
+				box->getLocation()->z = x;
 
 				DrawableWithSize obj = { box, sizeof(Box) };
 				objectsToDraw.push_back(obj);
@@ -91,20 +91,22 @@ void App::draw() {
 
 bool App::selectColumn(int x, int z)
 {
-	auto yColumn = playingField[x][z];
 	bool succes = false;
 
 	for (size_t i = 0; i < 4; i++)
 	{
-		if (yColumn[i]->getSelectedByPlayer() == 0 ) {
-			yColumn[i]->setSelectedByPlayer(playerTurn);
+		if(playingField[x][i][z]->getSelectedByPlayer() == 0 ) {
+			playingField[x][i][z]->setSelectedByPlayer(playerTurn);
 			changePlayer();
 			succes = true;
+
+			std::stringstream ss;
+			ss << "Selecting: [X: " << x << " Y: " << i << " Z: " << z << "]";
+			SetWindowText(gfx->getParent()->getHandle(), ss.str().c_str());
+			checkForWinner();
 			break;
 		}
 	}
-
-	if (succes) checkForWinner();
 	return succes;
 }
 
@@ -133,16 +135,19 @@ void App::changePlayer()
 
 void App::checkForWinner() {
 	
-	auto winner = checkVertically();
-	if (!winner) winner = checkHorizontallyZ();
-	if (!winner) winner = checkHorizontallyX();
+	auto winner = checkY4inLine();
+	if (!winner) winner = checkX4inLine();
+	if (!winner) winner = checkZ4inLine();
+	if (!winner) winner = checkHorizontalPlaneDiagonal();
+	if (!winner) winner = checkVerticalPlaneDiagonal();
+	if (!winner) winner = checkDepthPlaneDiagonal();
+	if (!winner) winner = check3DDiagonal();
 	
 
 }
 
-bool App::checkVertically() {
+bool App::checkY4inLine() {
 	int firstSelection;
-	bool solidRow = true;
 	bool winnerFound = false;
 
 	for (size_t k = 0; k < 4; k++)
@@ -150,39 +155,17 @@ bool App::checkVertically() {
 		for (size_t j = 0; j < 4; j++)
 		{
 			if (!winnerFound) {
+				bool solidRow = true;
 				for (size_t i = 0; i < 4; i++)
 				{
-					if (i == 0) firstSelection = playingField[k][j][0]->getSelectedByPlayer();
-					else solidRow = solidRow && (playingField[k][j][i]->getSelectedByPlayer() == firstSelection);
-				}
-
-				if (solidRow) {
-					winner = firstSelection;
-					winnerFound = true;
-				}
-			}
-		}
-	}
-	return winnerFound;
-}
-
-bool App::checkHorizontallyZ() {
-	int firstSelection;
-	bool solidRow = true;
-	bool winnerFound = false;
-
-	for (size_t k = 0; k < 4; k++)
-	{
-		for (size_t j = 0; j < 4; j++)
-		{
-			if (!winnerFound) {
-				for (size_t i = 0; i < 4; i++)
-				{
-					if (i == 0) firstSelection = playingField[j][0][k]->getSelectedByPlayer();
+					if (i == 0) {
+						firstSelection = playingField[j][0][k]->getSelectedByPlayer();
+						if (firstSelection == 0) break;
+					}
 					else solidRow = solidRow && (playingField[j][i][k]->getSelectedByPlayer() == firstSelection);
 				}
 
-				if (solidRow) {
+				if (solidRow && firstSelection != 0 ) {
 					winner = firstSelection;
 					winnerFound = true;
 				}
@@ -192,9 +175,8 @@ bool App::checkHorizontallyZ() {
 	return winnerFound;
 }
 
-bool App::checkHorizontallyX() {
+bool App::checkX4inLine() {
 	int firstSelection;
-	bool solidRow = true;
 	bool winnerFound = false;
 
 	for (size_t k = 0; k < 4; k++)
@@ -202,18 +184,215 @@ bool App::checkHorizontallyX() {
 		for (size_t j = 0; j < 4; j++)
 		{
 			if (!winnerFound) {
+				bool solidRow = true;
 				for (size_t i = 0; i < 4; i++)
 				{
-					if (i == 0) firstSelection = playingField[0][j][k]->getSelectedByPlayer();
-					else solidRow = solidRow && (playingField[i][j][k]->getSelectedByPlayer() == firstSelection);
+					if (i == 0) {
+						firstSelection = playingField[0][k][j]->getSelectedByPlayer();
+						if (firstSelection == 0) break;
+					}
+					else solidRow = solidRow && (playingField[i][k][j]->getSelectedByPlayer() == firstSelection);
 				}
 
-				if (solidRow) {
+				if (solidRow && firstSelection != 0) {
 					winner = firstSelection;
 					winnerFound = true;
 				}
 			}
 		}
 	}
+	return winnerFound;
+}
+
+bool App::checkZ4inLine() {
+	int firstSelection;
+	bool winnerFound = false;
+
+	for (size_t k = 0; k < 4; k++)
+	{
+		for (size_t j = 0; j < 4; j++)
+		{
+			if (!winnerFound) {
+				bool solidRow = true;
+				for (size_t i = 0; i < 4; i++)
+				{
+					if (i == 0) {
+						firstSelection = playingField[j][k][0]->getSelectedByPlayer();
+						if (firstSelection == 0) break;
+					}
+					else solidRow = solidRow && (playingField[j][k][i]->getSelectedByPlayer() == firstSelection);
+				}
+
+				if (solidRow && firstSelection != 0) {
+					winner = firstSelection;
+					winnerFound = true;
+				}
+			}
+		}
+	}
+	return winnerFound;
+}
+
+bool App::checkHorizontalPlaneDiagonal() {
+	int bottomLeft;
+	int bottomRight;
+	bool winnerFound = false;
+
+	
+	for (size_t j = 0; j < 4; j++)
+	{
+		if (!winnerFound) {
+			bool upwardsDiagonal = true;
+			bool downwardsDiagonal = true;
+
+			for (size_t i = 0; i < 4; i++)
+			{
+				if (i == 0) {
+					bottomLeft = playingField[0][j][0]->getSelectedByPlayer();
+					bottomRight = playingField[3][j][0]->getSelectedByPlayer();
+					if (bottomLeft == 0 && bottomRight == 0) break;
+				}
+				else {
+					upwardsDiagonal = upwardsDiagonal && (playingField[i][j][i]->getSelectedByPlayer() == bottomLeft);
+					downwardsDiagonal = downwardsDiagonal && (playingField[3-i][j][i]->getSelectedByPlayer() == bottomRight);
+				}
+			}
+
+			if (upwardsDiagonal && bottomLeft != 0) {
+				winner = bottomLeft;
+				winnerFound = true;
+			}
+
+			else if (downwardsDiagonal && bottomRight != 0) {
+				winner = bottomRight;
+				winnerFound = true;
+			}
+		}
+	}
+	
+	return winnerFound;
+}
+
+bool App::checkVerticalPlaneDiagonal() {
+	int bottomLeft;
+	int bottomRight;
+	bool winnerFound = false;
+
+	for (size_t j = 0; j < 4; j++)
+	{
+		if (!winnerFound) {
+			bool upwardsDiagonal = true;
+			bool downwardsDiagonal = true;
+
+			for (size_t i = 0; i < 4; i++)
+			{
+				if (i == 0) {
+					bottomLeft = playingField[0][0][j]->getSelectedByPlayer();
+					bottomRight = playingField[3][0][j]->getSelectedByPlayer();
+					if (bottomLeft == 0 && bottomRight == 0) break;
+				}
+				else {
+					upwardsDiagonal = upwardsDiagonal && (playingField[i][i][j]->getSelectedByPlayer() == bottomLeft);
+					downwardsDiagonal = downwardsDiagonal && (playingField[i][3-i][j]->getSelectedByPlayer() == bottomRight);
+				}
+			}
+
+			if (upwardsDiagonal && bottomLeft != 0) {
+				winner = bottomLeft;
+				winnerFound = true;
+			}
+
+			else if (downwardsDiagonal && bottomRight != 0) {
+				winner = bottomRight;
+				winnerFound = true;
+			}
+		}
+	}
+
+	return winnerFound;
+}
+
+bool App::checkDepthPlaneDiagonal() {
+	int bottomLeft;
+	int bottomRight;
+	bool winnerFound = false;
+
+	for (size_t j = 0; j < 4; j++)
+	{
+		if (!winnerFound) {
+			bool upwardsDiagonal = true;
+			bool downwardsDiagonal = true;
+
+			for (size_t i = 0; i < 4; i++)
+			{
+				if (i == 0) {
+					bottomLeft = playingField[j][0][0]->getSelectedByPlayer();
+					bottomRight = playingField[j][0][3]->getSelectedByPlayer();
+					if (bottomLeft == 0 && bottomRight == 0) break;
+				}
+				else {
+					upwardsDiagonal = upwardsDiagonal && (playingField[j][i][i]->getSelectedByPlayer() == bottomLeft);
+					downwardsDiagonal = downwardsDiagonal && (playingField[j][i][3-i]->getSelectedByPlayer() == bottomRight);
+				}
+			}
+
+			if (upwardsDiagonal && bottomLeft != 0) {
+				winner = bottomLeft;
+				winnerFound = true;
+			}
+
+			else if (downwardsDiagonal && bottomRight != 0) {
+				winner = bottomRight;
+				winnerFound = true;
+			}
+		}
+	}
+
+	return winnerFound;
+}
+
+bool App::check3DDiagonal() {
+	int bottomLeftFront;
+	int bottomRightFront;
+	int topLeftFront;
+	int topRightFront;
+	bool winnerFound = false;
+	
+	bool bottomLeftFrontToRightTopBack = true;
+	bool bottomRightFrontToTopLeftBack = true;
+	bool topLeftFrontToBottomRightBack = true;
+	bool topRightFrontToBottomLeftBack = true;
+
+	for (size_t i = 0; i < 4; i++)
+	{
+		if (i == 0) {
+			bottomLeftFront = playingField[0][0][0]->getSelectedByPlayer();
+			bottomRightFront = playingField[3][0][0]->getSelectedByPlayer();
+			topLeftFront = playingField[0][3][0]->getSelectedByPlayer();
+			topRightFront = playingField[3][3][0]->getSelectedByPlayer();
+		}
+		else {
+			bottomLeftFrontToRightTopBack = bottomLeftFrontToRightTopBack && (playingField[i][i][i]->getSelectedByPlayer() == bottomLeftFront);
+			bottomRightFrontToTopLeftBack = bottomRightFrontToTopLeftBack && (playingField[3 - i][i][i]->getSelectedByPlayer() == bottomRightFront);
+			topLeftFrontToBottomRightBack = topLeftFrontToBottomRightBack && (playingField[i][3 - i][i]->getSelectedByPlayer() == topLeftFront);
+			topRightFrontToBottomLeftBack = topRightFrontToBottomLeftBack && (playingField[3 - i][3 - i][i]->getSelectedByPlayer() == topRightFront);
+		}
+	}
+
+	if (bottomLeftFrontToRightTopBack && bottomLeftFront != 0) {
+		winner = bottomLeftFront;
+		winnerFound = true;
+	} else if (bottomRightFrontToTopLeftBack && bottomRightFront != 0) {
+		winner = bottomRightFront;
+		winnerFound = true;
+	} else if (topLeftFrontToBottomRightBack && topLeftFront != 0) {
+		winner = topLeftFront;
+		winnerFound = true;
+	} else if (topRightFrontToBottomLeftBack && topRightFront != 0) {
+		winner = topRightFront;
+		winnerFound = true;
+	}
+
+
 	return winnerFound;
 }

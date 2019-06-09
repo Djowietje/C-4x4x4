@@ -31,7 +31,11 @@ private:
 	float counter = 0.0f;
 	int playerTurn = 1;
 	int winner = 0;
-	bool checkVertically();
-	bool checkHorizontallyZ();
-	bool checkHorizontallyX();
+	bool checkY4inLine();
+	bool checkX4inLine();
+	bool checkZ4inLine();
+	bool checkHorizontalPlaneDiagonal();
+	bool checkVerticalPlaneDiagonal();
+	bool checkDepthPlaneDiagonal();
+	bool check3DDiagonal();
 };

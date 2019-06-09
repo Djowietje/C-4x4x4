@@ -23,9 +23,9 @@ public:
 
 
 private:
-	float posX = 1.0f;
-	float posY = 1.0f;
-	float posZ = 1.0f;
+	float posX = 1.5f;
+	float posY = 1.5f;
+	float posZ = -5.0f;
 
 	float lookAtX = 0.0f;
 	float lookAtY = 0.0f;

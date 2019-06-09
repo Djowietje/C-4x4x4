@@ -2,7 +2,7 @@
 
 Camera::Camera()
 {
-	updateViewMatrix();
+	mouseMoved(1, 1);
 }
 
 DirectX::XMVECTOR Camera::getPosition() { return DirectX::XMVECTOR{ posX, posY, posZ }; }
