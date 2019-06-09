@@ -135,19 +135,17 @@ void App::changePlayer()
 
 void App::checkForWinner() {
 	
-	auto winner = checkY4inLine();
-	if (!winner) winner = checkX4inLine();
-	if (!winner) winner = checkZ4inLine();
+	auto winner = check4inLine();
 	if (!winner) winner = checkHorizontalPlaneDiagonal();
 	if (!winner) winner = checkVerticalPlaneDiagonal();
 	if (!winner) winner = checkDepthPlaneDiagonal();
 	if (!winner) winner = check3DDiagonal();
-	
-
 }
 
-bool App::checkY4inLine() {
-	int firstSelection;
+bool App::check4inLine() {
+	int firstSelectionX;
+	int firstSelectionY;
+	int firstSelectionZ;
 	bool winnerFound = false;
 
 	for (size_t k = 0; k < 4; k++)
@@ -155,76 +153,33 @@ bool App::checkY4inLine() {
 		for (size_t j = 0; j < 4; j++)
 		{
 			if (!winnerFound) {
-				bool solidRow = true;
+				bool solidRowX = true;
+				bool solidRowY = true;
+				bool solidRowZ = true;
 				for (size_t i = 0; i < 4; i++)
 				{
 					if (i == 0) {
-						firstSelection = playingField[j][0][k]->getSelectedByPlayer();
-						if (firstSelection == 0) break;
+						firstSelectionX = playingField[0][k][j]->getSelectedByPlayer();
+						firstSelectionY = playingField[j][0][k]->getSelectedByPlayer();
+						firstSelectionZ = playingField[j][k][0]->getSelectedByPlayer();
+
+					} else {
+						solidRowX = solidRowX && (playingField[i][k][j]->getSelectedByPlayer() == firstSelectionX);
+						solidRowY = solidRowY && (playingField[j][i][k]->getSelectedByPlayer() == firstSelectionY);
+						solidRowZ = solidRowZ && (playingField[j][k][i]->getSelectedByPlayer() == firstSelectionZ);
 					}
-					else solidRow = solidRow && (playingField[j][i][k]->getSelectedByPlayer() == firstSelection);
 				}
 
-				if (solidRow && firstSelection != 0 ) {
-					winner = firstSelection;
+				if (solidRowX && firstSelectionX != 0) {
+					winner = firstSelectionX;
 					winnerFound = true;
 				}
-			}
-		}
-	}
-	return winnerFound;
-}
-
-bool App::checkX4inLine() {
-	int firstSelection;
-	bool winnerFound = false;
-
-	for (size_t k = 0; k < 4; k++)
-	{
-		for (size_t j = 0; j < 4; j++)
-		{
-			if (!winnerFound) {
-				bool solidRow = true;
-				for (size_t i = 0; i < 4; i++)
-				{
-					if (i == 0) {
-						firstSelection = playingField[0][k][j]->getSelectedByPlayer();
-						if (firstSelection == 0) break;
-					}
-					else solidRow = solidRow && (playingField[i][k][j]->getSelectedByPlayer() == firstSelection);
-				}
-
-				if (solidRow && firstSelection != 0) {
-					winner = firstSelection;
+				else if (solidRowY && firstSelectionY != 0) {
+					winner = firstSelectionY;
 					winnerFound = true;
 				}
-			}
-		}
-	}
-	return winnerFound;
-}
-
-bool App::checkZ4inLine() {
-	int firstSelection;
-	bool winnerFound = false;
-
-	for (size_t k = 0; k < 4; k++)
-	{
-		for (size_t j = 0; j < 4; j++)
-		{
-			if (!winnerFound) {
-				bool solidRow = true;
-				for (size_t i = 0; i < 4; i++)
-				{
-					if (i == 0) {
-						firstSelection = playingField[j][k][0]->getSelectedByPlayer();
-						if (firstSelection == 0) break;
-					}
-					else solidRow = solidRow && (playingField[j][k][i]->getSelectedByPlayer() == firstSelection);
-				}
-
-				if (solidRow && firstSelection != 0) {
-					winner = firstSelection;
+				else if (solidRowZ && firstSelectionZ != 0) {
+					winner = firstSelectionZ;
 					winnerFound = true;
 				}
 			}
